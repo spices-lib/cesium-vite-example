@@ -2,12 +2,49 @@ import { Viewer } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./style.css";
 import * as Cesium from "cesium";
+import gsap from 'gsap'
+import * as dat from 'dat.gui'
+
+import { MaterialShaderConstructor } from './MaterialShaderConstructor.js'
 
 import vert from './Shader.Primitive.vert?url&raw'
 import frag from './Shader.Primitive.frag?url&raw'
 
+class ShaderDataInstance extends MaterialShaderConstructor {
+
+    constructor(name = 'hello') { super(name) }
+
+    static intexture = {
+        type: this.m_type.sampler2D,
+        value: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT082lJARHoD-vwi2w_KSxMWWFzdOcIsM0Chg&s'
+    }
+    static ringCenter = { type: this.m_type.vec2, value: { x: 0.0, y: 0.0 }}
+    static blurRadius = { type: this.m_type.float, value: 0.1 }
+    static ringRadius = { type: this.m_type.float, value: 0.2 }
+    static ringThickness =  { type: this.m_type.float, value: 0.05 }
+}
+
+// Debug UI
+const gui = new dat.GUI()
+
+// Function Library
+const functions = {
+    durationTime : 2,
+    animation: () => {
+        gsap.to(ShaderDataInstance.ringRadius.value, { duration: functions.durationTime, value: 2.0 })
+        gsap.to(ShaderDataInstance.ringRadius.value, { duration: 0, delay: functions.durationTime, value: 0.0 })
+    }
+}
+gui.add(functions, 'animation')
+gui.add(functions, 'durationTime').min(0).max(1).step(0.01).name('durationTime')
+gui.add(ShaderDataInstance.ringCenter.value, 'x').min(-0.5).max(0.5).step(0.01).name('ringCenter_x')
+gui.add(ShaderDataInstance.ringCenter.value, 'y').min(-0.5).max(0.5).step(0.01).name('ringCenter_y')
+gui.add(ShaderDataInstance.blurRadius, 'value').min(0).max(0.5).step(0.01).name('blurRadius')
+gui.add(ShaderDataInstance.ringRadius, 'value').min(0).max(0.5).step(0.01).name('ringRadius')
+gui.add(ShaderDataInstance.ringThickness, 'value').min(0).max(0.5).step(0.01).name('ringThickness')
+
 // Viewer and Scene
-const viewer = new Viewer("cesiumContainer",);
+const viewer = new Viewer("cesiumContainer");
 const scene = viewer.scene;
 
 // geometry instance
@@ -22,34 +59,7 @@ const instance = new Cesium.GeometryInstance({
 // material appearance
 const appearance = new Cesium.MaterialAppearance({
     //aboveGround: true,
-    material: new Cesium.Material({
-        fabric: {
-            type: 'Hello',
-            uniforms: {
-                intexture: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT082lJARHoD-vwi2w_KSxMWWFzdOcIsM0Chg&s',
-                ringCenter: { x: 0.0, y: 0.0 },
-                blurRadius: 0.0,
-                ringRadius: 0.0,
-                ringThickness: 0.0,
-            },
-            source : `
-            #define GET_FLOAT(name) float get##name() { return name; }
-            #define GET_VEC2(name)  vec2  get##name() { return name; }
-            #define GET_TEXTURE2D(name) vec4 get##name(in float uv) { return texture(name, uv); }
-            
-            //GET_TEXTURE2D(intexture)
-            //GET_VEC2(ringCenter)
-            //GET_FLOAT(blurRadius)
-            //GET_FLOAT(ringRadius)
-            //GET_FLOAT(ringThickness)
-            
-             #define A(name) vec2 getname() { return name; }
-             
-             A(ringCenter)
-            
-            `
-        },
-    }),
+    material: ShaderDataInstance.toCesiumMaterial(true),
     vertexShaderSource: vert,
     fragmentShaderSource: frag
 })

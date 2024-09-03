@@ -39,6 +39,8 @@
     "vite-plugin-static-copy": "^1.0.0"
   },
   "dependencies": {
+    "gsap": "^3.12.5",
+    "dat.gui": "^0.7.9",
     "cesium": "^1.114.0"
   },
   "lint-staged": {

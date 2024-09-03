@@ -29,8 +29,7 @@ void main()
     materialInput.st = v_st;
 
 
-    //vec3 color = getintexture(v_st).xyz;
-    //float r = ring(v_st - getringCenter(), 0.2, 0.05, 0.02);
-    //out_FragColor = vec4(color, r);
-    out_FragColor = vec4(1.0);
+    vec3 color = texture(u_intexture, v_st).xyz;
+    float r = ring(v_st - u_ringCenter, u_ringRadius, u_ringThickness, u_blurRadius);
+    out_FragColor = vec4(color, r);
 }
