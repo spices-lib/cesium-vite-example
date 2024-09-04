@@ -146,8 +146,8 @@ export class MaterialShaderConstructor {
 class ShaderConstructor extends MaterialShaderConstructor {
     constructor(name) { super(name) }
 
-    static t2D  = { type: this.m_type.sampler2D, value: 'url' }
-    static f    = { type: this.m_type.float    , value: 0.0 }
+    static t2D = { type: this.m_type.sampler2D, value: 'url' }
+    static f  = { type: this.m_type.float    , value: 0.0 }
     static v2   = { type: this.m_type.vec2     , value: { x: 0.0, y: 0.0 } }
     static v3   = { type: this.m_type.vec3     , value: { x: 0.0, y: 0.0, z: 0.0 } }
     static v4   = { type: this.m_type.vec4     , value: { x: 0.0, y: 0.0, z: 0.0, w: 0.0 } }

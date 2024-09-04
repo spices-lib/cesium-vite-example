@@ -4,6 +4,7 @@ import "./style.css";
 import * as Cesium from "cesium";
 import gsap from 'gsap'
 import * as dat from 'dat.gui'
+import texture from './fengwotu.jpg'
 
 import { MaterialShaderConstructor } from './MaterialShaderConstructor.js'
 
@@ -16,7 +17,7 @@ class ShaderDataInstance extends MaterialShaderConstructor {
 
     static intexture = {
         type: this.m_type.sampler2D,
-        value: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT082lJARHoD-vwi2w_KSxMWWFzdOcIsM0Chg&s'
+        value: texture
     }
     static ringCenter = { type: this.m_type.vec2, value: { x: 0.0, y: 0.0 }}
     static blurRadius = { type: this.m_type.float, value: 0.1 }

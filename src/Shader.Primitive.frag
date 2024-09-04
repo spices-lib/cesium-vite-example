@@ -28,8 +28,7 @@ void main()
     materialInput.positionToEyeEC = positionToEyeEC;
     materialInput.st = v_st;
 
-
-    vec3 color = texture(u_intexture, v_st).xyz;
+    vec3 color = vec3(1.0 - texture(u_intexture, v_st).x);
     float r = ring(v_st - u_ringCenter, u_ringRadius, u_ringThickness, u_blurRadius);
     out_FragColor = vec4(color, r);
 }
