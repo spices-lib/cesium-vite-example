@@ -1,4 +1,4 @@
-import { Viewer } from "cesium";
+import {Terrain, Viewer} from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./style.css";
 import * as Cesium from "cesium";
@@ -45,14 +45,16 @@ gui.add(ShaderDataInstance.ringRadius, 'value').min(0).max(0.5).step(0.01).name(
 gui.add(ShaderDataInstance.ringThickness, 'value').min(0).max(0.5).step(0.01).name('ringThickness')
 
 // Viewer and Scene
-const viewer = new Viewer("cesiumContainer");
+const viewer = new Viewer("cesiumContainer", {
+    terrain: Terrain.fromWorldTerrain()
+});
 const scene = viewer.scene;
 
 // geometry instance
 const instance = new Cesium.GeometryInstance({
   geometry: new Cesium.RectangleGeometry({
     materialSupport :  Cesium.MaterialAppearance.MaterialSupport.BASIC.vertexFormat,
-    rectangle: Cesium.Rectangle.fromDegrees(-100.0, 20.0, -90.0, 30.0),
+    rectangle: Cesium.Rectangle.fromDegrees(-100.0, 20.0, -80.0, 50.0),
     vertexFormat: Cesium.EllipsoidSurfaceAppearance.VERTEX_FORMAT,
   }),
 });
