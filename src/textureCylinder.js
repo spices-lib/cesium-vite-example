@@ -2,12 +2,7 @@ import {Terrain, Viewer} from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./style.css";
 import * as Cesium from "cesium";
-import gsap from 'gsap'
-import * as dat from 'dat.gui'
 import texture from './aroma_aromatic_beverage_bio.jpg'
-
-// Debug UI
-const gui = new dat.GUI()
 
 // Viewer and Scene
 const viewer = new Viewer("cesiumContainer", {
@@ -15,15 +10,28 @@ const viewer = new Viewer("cesiumContainer", {
 });
 const scene = viewer.scene;
 
+// 将经纬度转换为 Cartesian3 坐标系的坐标
+const position = Cesium.Cartesian3.fromDegrees(112.88809132, 23.18102476, 1000);
+const eCartesian3 = Cesium.EncodedCartesian3.fromCartesian(position)
+
+console.log(eCartesian3.high)
+
+// 创建模型矩阵，使用默认的无旋转矩阵（你可以根据需要设置旋转）
+const modelMatrix = Cesium.Transforms.headingPitchRollToFixedFrame(
+    position,
+    new Cesium.HeadingPitchRoll(0.0, 0.0, 0.0) // 如果需要旋转，可以在此调整
+);
+
 // geometry instance
 const instance = new Cesium.GeometryInstance({
     geometry: new Cesium.CylinderGeometry({
-        length: 500000000,
-        topRadius: 500000000,
-        bottomRadius: 500000000,
+        length: 1000,
+        topRadius: 500,
+        bottomRadius: 500,
         materialSupport :  Cesium.MaterialAppearance.MaterialSupport.BASIC.vertexFormat,
         vertexFormat: Cesium.EllipsoidSurfaceAppearance.VERTEX_FORMAT,
     }),
+    modelMatrix: modelMatrix, // 使用模型矩阵来设置位置
 });
 
 // material appearance
@@ -33,7 +41,10 @@ const appearance = new Cesium.MaterialAppearance({
         fabric: {
             type: "Hello",
             uniforms: {
-                texture: texture
+                texture: texture,
+                centerhigh: eCartesian3.high,
+                centerlow: eCartesian3.low,
+                modelMatrix: { value: modelMatrix, type: Cesium.UniformType.MAT4 }
             },
         }
     }),
@@ -60,8 +71,6 @@ const appearance = new Cesium.MaterialAppearance({
             v_normalEC = czm_normal * normal;
             v_normal = normal;
             gl_Position = czm_modelViewProjectionRelativeToEye * p;
-            
-            
         }
     `,
     fragmentShaderSource: `
@@ -73,9 +82,9 @@ const appearance = new Cesium.MaterialAppearance({
         
         void main()
         {
-            vec3 position = normalize(v_position);
+            vec3 position = v_position - centerhigh_1 - centerlow_2;
         
-            float x;
+            /*float x;
             if(position.y >= 0.0)
             {
                 float r = dot(vec3(position.xy, 0.0), vec3(1.0, 0.0, 0.0));
@@ -91,14 +100,20 @@ const appearance = new Cesium.MaterialAppearance({
 
             if(y < 0.001 || y > 0.999)
             {
-                discard;
+                //discard;
             }
 
             vec2 uv = vec2(x, y);
             
         
-            vec4 color = texture(texture_0, uv);
-            out_FragColor = vec4(color);
+            vec4 color = texture(texture_0, uv);*/
+            
+            vec3 c = vec3(0.0);
+            if(position.x > 0.0) c = vec3(1.0, 0.0, 0.0);
+            else c = vec3(0.0, 1.0, 0.0);
+            
+            
+            out_FragColor = vec4(c, 1.0);
         }
     `
 })
